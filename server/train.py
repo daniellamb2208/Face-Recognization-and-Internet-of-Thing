@@ -9,11 +9,14 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.svm import SVC
 
+from random import sample
 
 def preprocessing(x):
 
     if not (x.ndim == 4 or x.ndim == 3):
         raise ValueError('Dimension error '+ str(x.dim))
+    if not x.shape == (160,160,3):
+        x = cv2.resize(x, (160,160), interpolation=cv2.INTER_AREA)
 
     mean = np.mean(x, axis=(0,1,2), keepdims=True)
     std = np.std(x, axis=(0,1,2), keepdims=True)
@@ -21,10 +24,11 @@ def preprocessing(x):
     y = (x - mean) / std_adj
     return y
 
+dataset_path = 'data_cropped/'
 
 model = keras.models.load_model('facenet_keras.h5')
 print("Facenet model loaded!")
-names = [f for f in os.listdir('crop')]
+names = [f for f in os.listdir(dataset_path)]
 print("Who is in the dataset", end='')
 print(names)
 
@@ -33,9 +37,12 @@ _feature = []    # concatenate all feature to a list along with _name to feed SV
 
 for name in names:
     print("processing "+name)
-    base_path = 'crop/' + name + '/'
+    base_path = dataset_path + name + '/'
     face_path = [os.path.join(base_path, f) for f in os.listdir(base_path)]   # formed/lamb/[1.jpg 2.jpg ...]
     
+    face_path = sample(face_path, 10)
+    print(face_path)
+
     number = 0
     for i in face_path:
         _name.append(name)  # tag with each face
@@ -49,14 +56,22 @@ _feature = np.concatenate(_feature)
 
 # encode name to be label
 encoder = LabelEncoder()
-encoder.fit(_name)
-print('label is ready')
-input_label = encoder.transform(_name)
+en = encoder.fit(_name)
+print('Label is ready')
+input_label = en.transform(_name)
 
 print('---------debug-------')
+'''
 print('Label ', end='')
+print(names)
+print('_name')
 print(_name)
+print('input_data')
 print(input_label)
+print('encoder', end='')
+print(encoder)
+print(en)
+'''
 print('---------------------')
 
 input_data = Normalizer(norm='l2').transform(_feature)
@@ -71,10 +86,13 @@ print('svm is trained')
 
 import joblib
 
-#joblib.dump(svm_model, 'svm_recog_model')
+joblib.dump(en, 'label.pkl')
+print("Name label saved")
 
-print("recognization model saved")
-print('done')
+joblib.dump(svm_model, 'svm.pkl')
+
+print("Recognization model saved")
+print('Done')
 
 '''
 import matplotlib.pyplot as plt

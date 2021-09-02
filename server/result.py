@@ -1,3 +1,4 @@
+from os import name
 from flask import request, Flask
 import json
 import base64
@@ -14,8 +15,10 @@ from sklearn.preprocessing import Normalizer
 
 app = Flask(__name__)
 emb_model = keras.models.load_model('facenet_keras.h5', compile = False)
-svc_model = joblib.load('svm_recog_model')
+svc_model = joblib.load('svm.pkl')
+name_label = joblib.load('label.pkl')
 count = 0
+print(name_label)
 
 def preprocessing(face):
     mean = np.mean(face, axis=(0,1,2), keepdims=True)
@@ -34,16 +37,17 @@ def recv_face():
     x = x.reshape((160, 160, 3))    # reshape image back to (160, 160, 3)
         # whether to check the data 
 
-    t = ['koul', 'lamb', 'lpc', 'mst', 'scc']
     x = preprocessing(x)
     f = emb_model.predict(np.expand_dims(x, axis=0))
     e = Normalizer(norm='l2').transform(f)
     r = svc_model.predict(e)
-    
-    print(t[r[0]])
+
+    g = name_label.inverse_transform(r)
+    print(g)    
+
     print('Handled a request')
 
-    return t[r[0]]
+    return 'b'
     # reutrn response to client side
 
 if __name__ == "__main__":
