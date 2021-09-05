@@ -14,7 +14,7 @@
 ##### Usage
 - Development environment
 ![](/pic/neofetch.png)
-- Respiberry pi 
+- Respiberry pi <br />
 ![](/pic/neofetch_rpi.png)
 
 - Host environment setting
@@ -22,7 +22,7 @@
     ``` sudo apt install docker -y ```<br />
     ``` sudo apt install docker-compose -y ```<br />
 
-- Respberry pi 4 <br /><br />
+- Respberry pi 4 <br />
     - You need to compile [opecv-python](https://pimylifeup.com/raspberry-pi-opencv/) 
     - Equipped with Camera and set it up
 
