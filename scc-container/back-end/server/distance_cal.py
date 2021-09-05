@@ -12,9 +12,13 @@ import pickle
 
 # for thinking how to tell stranger
 
+
+url = "mongodb://"+os.environ['name']+":"+os.environ['auth']+"@mongo:27017/"
+#url = "mongodb://192.168.0.102:27017/"
+
 def reconstruct_distance():
 
-    client = pymongo.MongoClient("mongodb://192.168.0.102:27017/")
+    client = pymongo.MongoClient(url)
     database = client["proj"]   # database of this proj
     data = database['dataset']  # data collection
     th = database['q3']

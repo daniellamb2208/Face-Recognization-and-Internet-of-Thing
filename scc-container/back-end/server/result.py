@@ -26,7 +26,10 @@ count = 0
 Header_count = 0    # the first header about new one
 number, pixel_x, pixel_y, name, information = (0,0,0,0,None)
 
-client = pymongo.MongoClient("mongodb://192.168.0.102:27017/")
+url = "mongodb://"+os.environ['name']+":"+os.environ['auth']+"@mongo:27017/"
+#url = "mongodb://192.168.0.102:27017/"
+
+client = pymongo.MongoClient(url)
 database = client["proj"]   # database of this proj
 
 def preprocessing(face):
@@ -139,7 +142,8 @@ def tell():
     g = name_label.inverse_transform(r)
     print('-------------------')
     print(g)   
-
+    if g[0] == 'alin':
+        return "Wrong"
 #-----------------------------------
     q3 = database['q3']
     ppl = database['dataset']

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-/app/server/result.py
+python3 /app/server/result.py

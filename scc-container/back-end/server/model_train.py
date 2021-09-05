@@ -14,7 +14,8 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.svm import SVC
 
-from random import sample
+url = "mongodb://"+os.environ['name']+":"+os.environ['auth']+"@mongo:27017/"
+#url = "mongodb://192.168.0.102:27017/"
 
 def preprocessing(x):
 
@@ -31,7 +32,7 @@ def preprocessing(x):
 
 def update():
     # Processing extract face from image with new comer
-    client = pymongo.MongoClient("mongodb://192.168.0.102:27017/")
+    client = pymongo.MongoClient(url)
     database = client["proj"]   # database of this proj
 
 
@@ -70,7 +71,7 @@ def init():
 
     model = keras.models.load_model('facenet_keras.h5', compile = False)
     print("Facenet model loaded!")
-    client = pymongo.MongoClient("mongodb://192.168.0.102:27017/")
+    client = pymongo.MongoClient(url)
     database = client["proj"]   # database of this proj
     collection = database['dataset']
 
@@ -134,7 +135,7 @@ def train(init_flag = False):
     update()
     dataset_path = 'data_cropped/'
 
-    client = pymongo.MongoClient("mongodb://192.168.0.102:27017/")
+    client = pymongo.MongoClient(url)
     database = client["proj"]   # database of this proj
 
     model = keras.models.load_model('facenet_keras.h5', compile = False)
