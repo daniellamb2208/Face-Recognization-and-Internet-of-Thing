@@ -32,7 +32,7 @@
 
 - Run Rpi client
     - [ ] it's still in develop, so now only terminal command to control demo
-    - [x] 
+    - [x] command
     - ``` cd rpi_client ```
     - ```python3 run.py ```
 
