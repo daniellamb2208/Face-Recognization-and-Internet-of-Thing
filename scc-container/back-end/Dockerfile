@@ -7,8 +7,8 @@ RUN apt-get update -y && \
 
 RUN pip3 install -r requirements.txt
 
-COPY . /app
+#COPY . /app
 
-WORKDIR /app
+#WORKDIR /app
 
-ENTRYPOINT /app/entry.sh
+#ENTRYPOINT /app/entry.sh

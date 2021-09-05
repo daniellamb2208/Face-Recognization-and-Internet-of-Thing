@@ -8,6 +8,12 @@ services:
                         - mongo
                 ports:
                         - "80:8081"
+                environment:
+                        USER: "lamb"
+                        PASSWORD: "b073040031"
+                        #volumes:
+                        #- ./back-end/:/app1
+
         mongo:
                 image: mongo
                 environment:
