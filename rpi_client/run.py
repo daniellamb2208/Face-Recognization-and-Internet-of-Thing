@@ -27,17 +27,19 @@ with PiCamera() as cam:
                 pass
             else: 
                 for (x, y, w, h) in faces:
-                    face = crop[y-10:y+h+10, x-10:x+w+10, :]
+                    face = crop[y:y+h, x:x+w, :]
                     face = cv2.resize(face, (160,160), interpolation=cv2.INTER_AREA)
 
                     print('POST to server')
-                    tmp = requests.post('http://192.168.0.102:8081/', data=face.tobytes(), headers={'Content-Type':'application/octet-stream'})
+                    tmp = requests.post('http://192.168.0.102:8081/validate', data=face.tobytes(), headers={'Content-Type':'application/octet-stream'})
                     print('finished')
 
                     # get result from response
                     print(tmp.content)
 
-                    cv2.rectangle(image, (x, y), (x+w, y+h), (0, 0, 255), 2)
+                    if not tmp.content == b'Wrong':
+                        cv2.putText(image, tmp.content.decode('utf-8'), (x+w, y+int(h/2)), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0,255,255),1, cv2.LINE_AA)
+                        cv2.rectangle(image, (x, y), (x+w, y+h), (0, 0, 255), 2)
                     
             cv2.imshow('stream', image)
             rawCapture.truncate(0)
