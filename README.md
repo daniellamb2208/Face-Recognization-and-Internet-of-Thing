@@ -3,30 +3,7 @@
 
 - About face-recognition and IoT setup
 - tree
-.
-├── LICENSE
-├── README.md
-├── rpi_client
-│   ├── haarcascade_frontalface_default.xml
-│   ├── run.py
-│   ├── send.py
-│   └── take_data.py
-├── scc-container
-│   ├── back-end
-│   │   ├── Dockerfile
-│   │   ├── entry.sh
-│   │   ├── requirements.txt
-│   │   └── server
-│   │       ├── distance_cal.py
-│   │       ├── facenet_keras.h5
-│   │       ├── haarcascade_frontalface_default.xml
-│   │       ├── label.pkl
-│   │       ├── model_train.py
-│   │       ├── result.py
-│   │       ├── svm.pkl
-│   │       └── templates
-│   │           └── Home.html
-│   ├── docker-compose.yml
+![](/pic/tree.png)
 
 ---
 ##### Original idea
