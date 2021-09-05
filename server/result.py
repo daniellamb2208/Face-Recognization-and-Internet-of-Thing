@@ -1,21 +1,33 @@
+import os
+from time import thread_time
 from flask import request, Flask
 import json
 import base64
 from flask.templating import render_template
 import numpy as np
 import cv2
-
+import pymongo
 from tensorflow import keras
 import joblib
+from bson.binary import Binary
+import pickle
 
 from sklearn.preprocessing import Normalizer
 
+import model_train
+import distance_cal
 # Get POST from rpi, Recognize the face, and Response
 
 app = Flask(__name__)
 emb_model = keras.models.load_model('facenet_keras.h5', compile = False)
-svc_model = joblib.load('svm_recog_model')
+svc_model = joblib.load('svm.pkl')
+name_label = joblib.load('label.pkl')
 count = 0
+Header_count = 0    # the first header about new one
+number, pixel_x, pixel_y, name, information = (0,0,0,0,None)
+
+client = pymongo.MongoClient("mongodb://192.168.0.102:27017/")
+database = client["proj"]   # database of this proj
 
 def preprocessing(face):
     mean = np.mean(face, axis=(0,1,2), keepdims=True)
@@ -25,26 +37,147 @@ def preprocessing(face):
 
     return face
 
-@app.route("/", methods=['POST'])
-def recv_face():
-    
+@app.route("/")
+def home_page():
+    return render_template("Home.html")
+
+@app.route("/init")
+def welcome():
+    return "Welcome to this page without anything"
+
+@app.route("/init/<name>/<word>/<nonce>")
+def initialization(name=None, word=None, nonce=None):
+    if name == 'lamb' and word == 'guess' and nonce == '31':
+        database['untrained'].delete_many({})
+        database['dataset'].delete_many({})
+        database['q3'].delete_many({})
+        model_train.train(True)
+        print('Trained')
+        distance_cal.reconstruct_distance()
+        print('Q3 is ready')
+    else:
+        return 'gg'
+    return 'Initialized'
+
+@app.route("/recieve", methods = ['POST'])
+def recv_data():
+    # Recieve the data of new one
+
+    global number, pixel_x, pixel_y, name, information, Header_count
+
+    if Header_count == 0:
+        try:
+            number = int(request.form["number"])
+            pixel_x = request.form["pixel_x"] # supposed pixels is the same, in same bundle of data
+            pixel_y = request.form["pixel_y"]
+            name = request.form["name"]
+
+            untrained = database["untrained"]
+            exist = untrained.find_one({'name':name})
+            if not exist:
+                untrained.insert_one({'name':name})
+
+        except:
+            # error request, without above four element
+            number, pixel_x, pixel_y, name, information, Header_count = (0,0,0,0,None,0)
+            return '400'
+        try:
+            information = request.form["info"]
+            print(information)
+        except:
+            print("No more information about this person")
+            pass
+        try:
+            os.mkdir("raw/"+name)
+        except FileExistsError:
+            path = os.listdir("raw/"+name)
+            amount = len(list(path))
+            Header_count = Header_count + amount
+            number = number + amount
+        Header_count = Header_count + 1
+        print('Name:  ', end='')
+        print(name)
+        print('amount:', end='')
+        print(number)
+        print('shape: ('+str(pixel_x)+', '+str(pixel_y)+')')
+        
+        return 'Ready for recieving pic'
+    else:
+        try:
+            res = request.data
+            x = np.frombuffer(res, dtype=np.uint8)
+            x = x.reshape((int(pixel_x), int(pixel_y), 3))
+            cv2.imwrite('raw/'+name+'/'+str(Header_count)+'.jpg', x)
+            Header_count = Header_count + 1
+            if Header_count > number:
+                # successful tx all
+                number, pixel_x, pixel_y, name, information, Header_count = (0,0,0,0,None,0)
+                return 'Done'
+
+            return "Recieved "+str(Header_count-1)
+        except:
+            number, pixel_x, pixel_y, name, information, Header_count = (0,0,0,0,None,0)
+            # if failed within tranfer session, need restart to process
+            return 'Transfer error'
+
+@app.route("/validate", methods=['POST'])
+def tell():
+    # Get 160,160 from rpi collect in real-time face detect
+
     res = request.data  # take POST method 
 
-    x = np.frombuffer(res, dtype=np.uint8)  # decode bytes to ndarray
-    x = x.reshape((160, 160, 3))    # reshape image back to (160, 160, 3)
-        # whether to check the data 
-
-    t = ['koul', 'lamb', 'lpc', 'mst', 'scc']
+    try:
+        x = np.frombuffer(res, dtype=np.uint8)  # Decode bytes to ndarray
+        x = x.reshape((160, 160, 3))    # Reshape image back to (160, 160, 3)
+        # How to check the data 
+    except:
+        return '400'
     x = preprocessing(x)
     f = emb_model.predict(np.expand_dims(x, axis=0))
     e = Normalizer(norm='l2').transform(f)
     r = svc_model.predict(e)
-    
-    print(t[r[0]])
-    print('Handled a request')
+    g = name_label.inverse_transform(r)
+    print('-------------------')
+    print(g)   
 
-    return t[r[0]]
+#-----------------------------------
+    q3 = database['q3']
+    ppl = database['dataset']
+    print('1')
+    from random import sample
+    from scipy.spatial import distance
+    you = ppl.find_one({'name':g[0]})
+    print('2')
+    # print(you['name'])
+    print('3')
+    you = pickle.loads(you['embs'])
+    print('4')
+    take = sample(you, 10)
+
+    dis = []
+    for t in take:
+        dis.append(distance.euclidean(t, f))
+    min_inter = min(dis)
+
+    threshold = q3.find_one({'name':g[0]})
+    # print(threshold['name'])
+    print(threshold['q3'])
+    print(min_inter)
+    if min_inter > threshold['q3']:
+        print('Handled a request')
+        return "Wrong"
+        # tell it's not the person
+    # Checking the person if in the dataset
+#-----------------------------------
+
+    return g[0]
     # reutrn response to client side
 
+@app.route("/train")
+def train():
+    model_train.train()
+    distance_cal.reconstruct_distance()
+    return 'A'
+
 if __name__ == "__main__":
-    app.run("0.0.0.0", port=8081)  #端口为8081
+    app.run("0.0.0.0", port=8081, debug=True)  #端口为8081

@@ -1,0 +1,24 @@
+
+<input type="button" value="Init" onclick="location.href='/init/lamb/guess/31'">
+<p> </p>
+<!--You should first recieve the new comer into dataset, then click train to update recognization model -->
+<input type="button" value="Train" onclick="location.href='/train'">
+
+<p> Waiting for recieving new </p>
+
+<p> Showing log fetch from database </p>
+
+<div id="times">      
+</div>
+<script type="text/javascript">
+
+    function getDate(){
+
+        var date = new Date();
+        var date1 = date.toLocaleString();
+        var div1 = document.getElementById("times");
+
+        div1.innerHTML = date1;
+    }
+    setInterval("getDate()",1000);
+</script>
