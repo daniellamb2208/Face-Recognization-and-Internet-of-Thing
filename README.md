@@ -2,7 +2,7 @@
 **The project is instructed by [prof. Lai](https://www.hsnl.cse.nsysu.edu.tw//wklai/)**
 
 - About face-recognition and IoT setup
-- tree
+- tree <br />
 ![](/pic/tree.png)
 
 ---
@@ -18,17 +18,17 @@
 ![](/pic/neofetch_rpi.png)
 
 - Host environment setting
-    ``` sudo apt update && sudo apt upgrade -y```
-    ``` sudo apt install docker -y ```
-    ``` sudo apt install docker-compose -y ```
+    ``` sudo apt update && sudo apt upgrade -y```<br />
+    ``` sudo apt install docker -y ```<br />
+    ``` sudo apt install docker-compose -y ```<br />
 
-- Respberry pi 4 
+- Respberry pi 4 <br />
     - You need to compile [opecv-python](https://pimylifeup.com/raspberry-pi-opencv/) 
     - Equipped with Camera and set it up
 
 - Run server 
-    1\. ``` cd scc-container```
-    2\. ``` sudo docker-compose up  --env-file .env --build```
+    1\. ``` cd scc-container```<br />
+    2\. ``` sudo docker-compose up  --env-file .env --build```<br />
 
 - Run Rpi client
     - [ ] it's still in develop, so now only terminal command to control demo
