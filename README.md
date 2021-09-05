@@ -22,11 +22,11 @@
     ``` sudo apt install docker -y ```<br />
     ``` sudo apt install docker-compose -y ```<br />
 
-- Respberry pi 4 <br />
+- Respberry pi 4 <br /><br />
     - You need to compile [opecv-python](https://pimylifeup.com/raspberry-pi-opencv/) 
     - Equipped with Camera and set it up
 
-- Run server 
+- Run server <br />
     1\. ``` cd scc-container```<br />
     2\. ``` sudo docker-compose up  --env-file .env --build```<br />
 
