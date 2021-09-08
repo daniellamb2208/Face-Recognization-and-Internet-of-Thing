@@ -28,7 +28,7 @@
 
 - Run server <br />
     1\. ``` cd scc-container```<br />
-    2\. ``` sudo docker-compose up  --env-file .env --build```<br />
+    2\. ``` sudo docker-compose --env-file .env up --build```<br />
 
 - Run Rpi client
     - [ ] it's still in develop, so now only terminal command to control demo
