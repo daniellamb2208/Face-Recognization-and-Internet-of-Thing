@@ -27,7 +27,7 @@ Header_count = 0    # the first header about new one
 number, pixel_x, pixel_y, name, information = (0,0,0,0,None)
 
 url = "mongodb://"+os.environ['name']+":"+os.environ['auth']+"@mongo:27017/"
-print(url)
+print('----------------+'+url+'---------------------------')
 #url = "mongodb://192.168.0.102:27017/"
 
 client = pymongo.MongoClient(url)
