@@ -11,6 +11,7 @@ from tensorflow import keras
 import joblib
 from bson.binary import Binary
 import pickle
+import time
 
 from sklearn.preprocessing import Normalizer
 
@@ -128,6 +129,12 @@ def recv_data():
 def tell():
     # Get 160,160 from rpi collect in real-time face detect
 
+    _log = database["log"]
+    def timing():
+        localtime = time.localtime()
+        now = time.strftime("%Y-%m-%d %I:%M:%S %p", localtime)
+        return now
+
     res = request.data  # take POST method 
 
     try:
@@ -141,9 +148,11 @@ def tell():
     e = Normalizer(norm='l2').transform(f)
     r = svc_model.predict(e)
     g = name_label.inverse_transform(r)
+    bf = Binary(pickle.dumps(f, protocol=-1), subtype=128)
     print('-------------------')
     print(g)   
     if g[0] == 'alin':
+        _log.insert_one({"Time":timing(), "Who":"", "Stranger":True, "Emb":bf})
         return "Wrong"
 #-----------------------------------
     q3 = database['q3']
@@ -170,13 +179,35 @@ def tell():
     print(min_inter)
     if min_inter > threshold['q3']:
         print('Handled a request')
+        _log.insert_one({"Time":timing(), "Who":"", "Stranger":True, "Emb":bf})
         return "Wrong"
         # tell it's not the person
     # Checking the person if in the dataset
 #-----------------------------------
-
+    _log.insert_one({"Time":timing(), "Who":g[0], "Stranger":False, "Emb":bf})
     return g[0]
     # reutrn response to client side
+
+@app.route("/show")
+def history():
+    _log = database["log"]
+    if _log.find_one() == None:
+        return 'No data in the system'
+    
+    dictt = {}
+    x = _log.find()
+    nn = 0
+    for i in x:
+        dic = {}
+        dic['name'] = i['Who']
+        dic['time'] = i["Time"]
+        if i['Stranger']:
+            dic['Stranger'] = True
+        #dic['emb'] = pickle.loads(i['Emb'])
+        dictt[str(nn)] = dic
+        nn = nn + 1
+    return dictt
+    
 
 @app.route("/train")
 def train():
