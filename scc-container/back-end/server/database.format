@@ -1,0 +1,25 @@
+mongodb
+    database : proj
+    {
+        collection : untrained
+        {
+            "name" : name
+        }
+        collection:log
+        {
+            "Time" : "2021-09-29 12:00:00 PM (UTC+0)"
+            "Who"  : name (if Stranger, empty)
+            "Stranger" : boolean
+            "Emb"  : dumps embs to Binary type
+        }
+        collection:dataset
+        {
+            "name" : name
+            "embs" : all of embs (depend on how many pics)
+        }
+        collection:q3
+        {
+            "name" : name
+            "q3"   : q3 value
+        }
+    }

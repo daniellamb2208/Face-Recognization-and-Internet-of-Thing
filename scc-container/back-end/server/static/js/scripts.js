@@ -59,10 +59,58 @@ window.addEventListener('DOMContentLoaded', event => {
 });
 
 function getDate(){
-    var date = new Date();
-    var date1 = date.toLocaleString();
-    var div1 = document.getElementById("times");
-
-    div1.innerHTML = date1;
+    var date = new Date()
+    $("#times").text(date.toLocaleString())
 }
-setInterval("getDate()",1000);
+
+$('document').ready(async () => {
+
+    setInterval("getDate()",1000);
+
+    const url = 'temp'
+    let tmp = null
+    checkInterval = setInterval(async () => {
+        console.log('fresh_env')
+        await fetch(url).then(async response => {
+            tmp = await response.text()
+            let tmmp = tmp.replace('*', '°')
+            $('#env').text(tmmp)
+        })
+    }, 1500)
+
+
+    $('input[value="History"]').click(() => {
+        $('table').toggleClass('d-none')
+        let checkInterval = null
+        if(!$('table').hasClass('d-none')) {
+            const url = 'show'
+            let data = null
+            checkInterval = setInterval(async () => {
+                console.log('fresh')
+                await fetch(url).then(response => response.json())  
+                .then(json => {
+                    data = json
+                })
+                $('tbody').empty()
+                for(let i = Object.keys(data).length-1; i >= Object.keys(data).length - 10; i--) {
+                    let html = null
+                    if(data[i].name === '')
+                        html = `<tr>
+                                    <td><span class="text-danger">Stranger</span></td>
+                                    <td><span class="text-danger">${data[i].time}</span></td>
+                                </tr>`
+                    else
+                        html = `<tr>
+                                    <td>${data[i].name}</td>
+                                    <td>${data[i].time}</td>
+                                </tr>`
+                    $('tbody').append(html)
+                }
+                if($('table').hasClass('d-none'))
+                    clearInterval(checkInterval)
+            }, 3000)
+        }
+    })
+})
+
+

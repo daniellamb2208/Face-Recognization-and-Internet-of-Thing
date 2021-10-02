@@ -1,6 +1,6 @@
 import os
 from time import thread_time
-from flask import request, Flask
+from flask import request, Flask, jsonify, after_this_request
 import json
 import base64
 from flask.templating import render_template
@@ -56,6 +56,7 @@ def initialization(name=None, word=None, nonce=None):
         database['untrained'].delete_many({})
         database['dataset'].delete_many({})
         database['q3'].delete_many({})
+        database["log"].delete_many({})
         model_train.train(True)
         print('Trained')
         distance_cal.reconstruct_distance()
@@ -188,8 +189,14 @@ def tell():
     return g[0]
     # reutrn response to client side
 
-@app.route("/show")
+@app.route("/show", methods=['GET'])
 def history():
+
+    @after_this_request
+    def add_header(response):
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
     _log = database["log"]
     if _log.find_one() == None:
         return 'No data in the system'
@@ -206,8 +213,12 @@ def history():
         #dic['emb'] = pickle.loads(i['Emb'])
         dictt[str(nn)] = dic
         nn = nn + 1
-    return dictt
-    
+    return jsonify(dictt)
+
+@app.route("/temp")
+def temp():
+    import requests
+    return requests.post("http://192.168.0.105").content
 
 @app.route("/train")
 def train():

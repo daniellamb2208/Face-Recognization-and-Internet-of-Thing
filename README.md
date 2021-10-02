@@ -12,10 +12,6 @@
 - Apply what we learn for now, such as database, image processing, embedding system
 ---
 ##### Usage
-- Development environment
-![](/pic/neofetch.png)
-- Respiberry pi <br />
-![](/pic/neofetch_rpi.png)
 
 - Host environment setting
     ``` sudo apt update && sudo apt upgrade -y```<br />
