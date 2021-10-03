@@ -7,7 +7,7 @@ import numpy as np
 # get face upfront by entering name and automatically save 25 face wihout resizing
 
 cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-batch = 25
+batch = 200
 
 print('Please specify who you are, thanks:')
 name = input()

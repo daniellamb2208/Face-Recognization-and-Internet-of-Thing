@@ -31,14 +31,19 @@ with PiCamera() as cam:
                     face = cv2.resize(face, (160,160), interpolation=cv2.INTER_AREA)
 
                     print('POST to server')
-                    tmp = requests.post('http://192.168.0.102:8081/validate', data=face.tobytes(), headers={'Content-Type':'application/octet-stream'})
-                    print('finished')
+                    tmp = requests.post('http://daniellamb.duckdns.org:1234/validate', data=face.tobytes(), headers={'Content-Type':'application/octet-stream'})
+                    # print('finished')
 
                     # get result from response
+                    print('result')
                     print(tmp.content)
+                    print('\n')
 
                     if not tmp.content == b'Wrong':
-                        cv2.putText(image, tmp.content.decode('utf-8'), (x+w, y+int(h/2)), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0,255,255),1, cv2.LINE_AA)
+                        cv2.putText(image, tmp.content.decode('utf-8'), (x+w, y+int(h/2)), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 0),1, cv2.LINE_AA)
+                        cv2.rectangle(image, (x, y), (x+w, y+h), (0, 0, 0), 2)
+                    else:
+                        cv2.putText(image, "Strange", (x+w, y+int(h/2)), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255),1, cv2.LINE_AA)
                         cv2.rectangle(image, (x, y), (x+w, y+h), (0, 0, 255), 2)
                     
             cv2.imshow('stream', image)
