@@ -30,6 +30,9 @@ def preprocessing(x):
     y = (x - mean) / std_adj
     return y
 
+def l2_normalize(x):
+    return (x / np.sqrt(np.maximum(np.sum(np.square(x), axis=-1, keepdims=True), 1e-10)))
+
 def update():
     # Processing extract face from image with new comer
     client = pymongo.MongoClient(url)
@@ -98,7 +101,7 @@ def init():
             face = cv2.imread(i)
             number = number + 1
             print("Read "+str(number)+"/"+str(len(face_path)))
-            _feature.append(model.predict(np.expand_dims(preprocessing(face), axis=0)))    # facenet extract 128dim v
+            _feature.append(l2_normalize(model.predict(np.expand_dims(preprocessing(face), axis=0))))    # facenet extract 128dim v
         collection.insert_one({'name':name, 'embs':Binary(pickle.dumps(_feature, protocol=-1), subtype=128)})
         print("Inserted")
     
@@ -158,7 +161,7 @@ def train(init_flag = False):
             img = preprocessing(cv2.imread(k))
             _number = _number + 1
             print(str(_number)+'/'+str(len(absp)))
-            embs.append(model.predict(np.expand_dims(img, axis=0)))
+            embs.append(l2_normalize(model.predict(np.expand_dims(img, axis=0))))
 
         collection.insert_one({'name':i, 'embs':Binary(pickle.dumps(embs, protocol=-1), subtype=128)})
 

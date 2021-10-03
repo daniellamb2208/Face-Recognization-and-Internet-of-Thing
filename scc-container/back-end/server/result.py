@@ -21,8 +21,12 @@ import distance_cal
 
 app = Flask(__name__)
 emb_model = keras.models.load_model('facenet_keras.h5', compile = False)
-svc_model = joblib.load('svm.pkl')
-name_label = joblib.load('label.pkl')
+
+def reload():
+    global svc_model, name_label
+    svc_model = joblib.load('svm.pkl')
+    name_label = joblib.load('label.pkl')
+reload()
 count = 0
 Header_count = 0    # the first header about new one
 number, pixel_x, pixel_y, name, information = (0,0,0,0,None)
@@ -151,33 +155,26 @@ def tell():
     g = name_label.inverse_transform(r)
     bf = Binary(pickle.dumps(f, protocol=-1), subtype=128)
     print('-------------------')
-    print(g)   
-    if g[0] == 'alin':
+    print(g)
+    '''if g[0] == 'alin':
         _log.insert_one({"Time":timing(), "Who":"", "Stranger":True, "Emb":bf})
-        return "Wrong"
+        return "Wrong"'''
 #-----------------------------------
     q3 = database['q3']
     ppl = database['dataset']
-    print('1')
+
     from random import sample
     from scipy.spatial import distance
     you = ppl.find_one({'name':g[0]})
-    print('2')
-    # print(you['name'])
-    print('3')
     you = pickle.loads(you['embs'])
-    print('4')
     take = sample(you, 10)
 
     dis = []
     for t in take:
-        dis.append(distance.euclidean(t, f))
+        dis.append(distance.euclidean(t, e))
     min_inter = min(dis)
-
     threshold = q3.find_one({'name':g[0]})
-    # print(threshold['name'])
-    print(threshold['q3'])
-    print(min_inter)
+
     if min_inter > threshold['q3']:
         print('Handled a request')
         _log.insert_one({"Time":timing(), "Who":"", "Stranger":True, "Emb":bf})
@@ -224,7 +221,13 @@ def temp():
 def train():
     model_train.train()
     distance_cal.reconstruct_distance()
+    reload()
     return 'A'
+
+@app.route("/test")
+def x():
+    import validate
+    return validate.train()
 
 if __name__ == "__main__":
     app.run("0.0.0.0", port=8081, debug=True)  #端口为8081
