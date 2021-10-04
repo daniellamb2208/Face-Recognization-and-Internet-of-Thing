@@ -215,7 +215,7 @@ def history():
 @app.route("/temp")
 def temp():
     import requests
-    return requests.post("http://192.168.0.105").content
+    return requests.post("http://192.168.0.101:8081").content
 
 @app.route("/train")
 def train():
