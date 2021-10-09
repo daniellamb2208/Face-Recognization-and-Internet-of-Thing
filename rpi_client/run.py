@@ -8,6 +8,7 @@ import requests
 
 import time
 import RPi.GPIO as io
+import os
 
 io.setmode(io.BOARD)
 io.setup(11, io.OUT)
@@ -17,6 +18,11 @@ def success():
     time.sleep(0.5)
     io.output(11, False)
 
+count = 0
+try:
+    os.mkdir('testing')
+except FileExistsError:
+    count = len(os.listdir('testing'))
 
 cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 recognize = ''
