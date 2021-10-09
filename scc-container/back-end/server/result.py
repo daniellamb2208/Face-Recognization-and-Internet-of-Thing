@@ -12,6 +12,7 @@ import joblib
 from bson.binary import Binary
 import pickle
 import time
+import logging
 
 from sklearn.preprocessing import Normalizer
 
@@ -20,6 +21,11 @@ import distance_cal
 # Get POST from rpi, Recognize the face, and Response
 
 app = Flask(__name__)
+app.logger.disabled = True
+log = logging.getLogger('werkzeug')
+log.disabled = True
+
+
 emb_model = keras.models.load_model('facenet_keras.h5', compile = False)
 
 def reload():
@@ -61,10 +67,11 @@ def initialization(name=None, word=None, nonce=None):
         database['dataset'].delete_many({})
         database['q3'].delete_many({})
         database["log"].delete_many({})
-        model_train.train(True)
+        model_train.train()
         print('Trained')
         distance_cal.reconstruct_distance()
-        print('Q3 is ready')
+        print('Threshold is ready')
+        reload()
     else:
         return 'gg'
     return 'Initialized'
@@ -150,15 +157,12 @@ def tell():
         return '400'
     x = preprocessing(x)
     f = emb_model.predict(np.expand_dims(x, axis=0))
-    e = Normalizer(norm='l2').transform(f)
+    e = model_train.l2_normalize(f)
     r = svc_model.predict(e)
     g = name_label.inverse_transform(r)
     bf = Binary(pickle.dumps(f, protocol=-1), subtype=128)
     print('-------------------')
-    print(g)
-    '''if g[0] == 'alin':
-        _log.insert_one({"Time":timing(), "Who":"", "Stranger":True, "Emb":bf})
-        return "Wrong"'''
+    # print(g)
 #-----------------------------------
     q3 = database['q3']
     ppl = database['dataset']
@@ -167,25 +171,37 @@ def tell():
     from scipy.spatial import distance
     you = ppl.find_one({'name':g[0]})
     you = pickle.loads(you['embs'])
-    take = sample(you, 10)
+    # take = sample(you, 20)
 
     dis = []
-    for t in take:
+    for t in you:
         dis.append(distance.euclidean(t, e))
-    min_inter = min(dis)
+    # max_inter = max(dis)
     threshold = q3.find_one({'name':g[0]})
 
-    if min_inter > threshold['q3']:
-        print('Handled a request')
-        _log.insert_one({"Time":timing(), "Who":"", "Stranger":True, "Emb":bf})
-        return "Wrong"
-        # tell it's not the person
-    # Checking the person if in the dataset
-#-----------------------------------
-    _log.insert_one({"Time":timing(), "Who":g[0], "Stranger":False, "Emb":bf})
-    return g[0]
-    # reutrn response to client side
+    # th60 = threshold['q6'] # 62.5
+    # thq2 = threshold['q2'] # 50
+    print(type(g))
+    print('predict ' + g[0])
+    print(threshold['q3'])
+    print(threshold['q60'])
+    print(threshold['q2'])
+    min_inter = min(dis)
+    print(min_inter)
 
+    print('Handled a request')
+
+    if min_inter < max(threshold['q60'], 0.55):
+        #_log.insert_one({"Time":timing(), "Who":g[0], "Stranger":False, "Emb":bf})
+        print('pass')
+        return g[0]
+    print('block')
+    # _log.insert_one({"Time":timing(), "Who":g[0], "Stranger":True, "Emb":bf})
+    return "unknown"
+    # tell it's not the person
+    # Checking the person if in the dataset
+    # reutrn response to client side
+#-----------------------------------
 @app.route("/show", methods=['GET'])
 def history():
 
@@ -215,7 +231,7 @@ def history():
 @app.route("/temp")
 def temp():
     import requests
-    return requests.post("http://192.168.0.101:8081").content
+    return requests.post("http://192.168.0.105:8081").content
 
 @app.route("/train")
 def train():

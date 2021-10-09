@@ -21,5 +21,7 @@ mongodb
         {
             "name" : name
             "q3"   : q3 value
+            "q60"  : q62.5
+            "q2"   : q2
         }
     }
