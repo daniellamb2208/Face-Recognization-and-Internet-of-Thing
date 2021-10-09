@@ -7,7 +7,7 @@ import numpy as np
 # get face upfront by entering name and automatically save 25 face wihout resizing
 
 cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-batch = 200
+batch = 50
 
 print('Please specify who you are, thanks:')
 name = input()
@@ -37,7 +37,7 @@ with PiCamera() as cam:
                 pass
             else: 
                 (x, y, w, h) = faces[0]
-                face = image[y-10:y+h+10, x-10:x+w+10, :]
+                face = image[y-20:y+h+20, x-20:x+w+20, :]
                 # face = cv2.resize(face, (160,160), interpolation=cv2.INTER_AREA)
                 #print((x,y,h,w))    
                 count = count + 1
