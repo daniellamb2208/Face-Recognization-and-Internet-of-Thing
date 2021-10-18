@@ -25,7 +25,7 @@ app.logger.disabled = True
 log = logging.getLogger('werkzeug')
 log.disabled = True
 
-
+_file = open("log.txt", 'a')
 emb_model = keras.models.load_model('facenet_keras.h5', compile = False)
 
 def reload():
@@ -60,7 +60,7 @@ def home_page():
 def welcome():
     return "Welcome to this page without anything"
 
-@app.route("/init/<name>/<word>/<nonce>")
+@app.route("/init/<name>/<word>/<nonce>", methods=['GET','POST'])
 def initialization(name=None, word=None, nonce=None):
     if name == 'lamb' and word == 'guess' and nonce == '31':
         database['untrained'].delete_many({})
@@ -74,6 +74,7 @@ def initialization(name=None, word=None, nonce=None):
         reload()
     else:
         return 'gg'
+    return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
     return 'Initialized'
 
 @app.route("/recieve", methods = ['POST'])
@@ -181,21 +182,34 @@ def tell():
 
     # th60 = threshold['q6'] # 62.5
     # thq2 = threshold['q2'] # 50
-    print(type(g))
+    # print(type(g))
     print('predict ' + g[0])
     print(threshold['q3'])
     print(threshold['q60'])
     print(threshold['q2'])
     min_inter = min(dis)
     print(min_inter)
+    
+    _file.write('-----------------------------\n')
+    _file.write(g[0]+'\n')
+    _file.write(str(threshold['q3'])+'\n')
+    _file.write(str(threshold['q60'])+'\n')
+    _file.write(str(threshold['q2'])+'\n')
+    _file.write(str(min_inter)+'\n')
+    
+    
 
     print('Handled a request')
 
-    if min_inter < max(threshold['q60'], 0.55):
+    if min_inter < threshold['q60']:
         #_log.insert_one({"Time":timing(), "Who":g[0], "Stranger":False, "Emb":bf})
         print('pass')
+        _file.writelines('pass\n')
+        _file.flush()
         return g[0]
     print('block')
+    _file.writelines('block\n')
+    _file.flush()
     # _log.insert_one({"Time":timing(), "Who":g[0], "Stranger":True, "Emb":bf})
     return "unknown"
     # tell it's not the person
@@ -233,11 +247,12 @@ def temp():
     import requests
     return requests.post("http://192.168.0.105:8081").content
 
-@app.route("/train")
+@app.route("/train", methods=['GET','POST'])
 def train():
     model_train.train()
     distance_cal.reconstruct_distance()
     reload()
+    return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
     return 'A'
 
 @app.route("/test")

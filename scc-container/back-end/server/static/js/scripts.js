@@ -70,23 +70,23 @@ $('document').ready(async () => {
     const url = 'temp'
     let tmp = null
     checkInterval = setInterval(async () => {
-        console.log('fresh_env')
+        //console.log('fresh_env')
         await fetch(url).then(async response => {
             tmp = await response.text()
-            let tmmp = tmp.replace('*', '°')
-            $('#env').text(tmmp)
+            let tmmp = tmp.replace('*', '°').split('\n')
+            $('#temp').text(tmmp[0])
+            $('#humi').text(tmmp[1])
         })
     }, 1500)
 
-
     $('input[value="History"]').click(() => {
-        $('table').toggleClass('d-none')
+        $('table[name="history"]').toggleClass('d-none')
         let checkInterval = null
-        if(!$('table').hasClass('d-none')) {
+        if(!$('table[name="history"]').hasClass('d-none')) {
             const url = 'show'
             let data = null
             checkInterval = setInterval(async () => {
-                console.log('fresh')
+                //console.log('fresh')
                 await fetch(url).then(response => response.json())  
                 .then(json => {
                     data = json
@@ -106,11 +106,48 @@ $('document').ready(async () => {
                                 </tr>`
                     $('tbody').append(html)
                 }
-                if($('table').hasClass('d-none'))
+                if($('table[name="history"]').hasClass('d-none'))
                     clearInterval(checkInterval)
             }, 3000)
         }
     })
+
+    $('input[value="Init"]').click(() => {
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            url: '/init/lamb/guess/31',
+            success: function () {
+                $('#exampleModal').modal('show')
+            }
+        });
+    })
+
+    $('input[value="Train"]').click(() => {
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            url: '/train',
+            success: function () {
+                $('#exampleModal').modal('show')
+            }
+        });
+    })
+
+    $('input[value="Environment"]').click(() => {
+        $('table[name="env"]').toggleClass('d-none')
+    })
+
+    $('#modal_close').click(() => {
+        $('#exampleModal').modal('hide')
+    })
 })
+
+$(document).on({
+    ajaxStart: function() {$("body").addClass("loading")},
+    ajaxStop: function() {$("body").removeClass("loading")}    
+});
 
 

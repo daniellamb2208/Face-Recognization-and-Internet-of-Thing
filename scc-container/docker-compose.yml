@@ -11,8 +11,8 @@ services:
                 environment:
                         name: ${name}
                         auth: ${auth}
-                        #volumes:
-                        #- ./back-end/:/app1
+                volumes:
+                        - ./back-end/server:/app
 
         mongo:
                 image: mongo

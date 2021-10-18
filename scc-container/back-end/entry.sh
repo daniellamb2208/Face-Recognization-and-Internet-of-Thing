@@ -1,3 +1,4 @@
 #!/bin/sh
 
-python3 /app/server/result.py
+sleep 86400
+# python3 /app/server/result.py

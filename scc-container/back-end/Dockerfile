@@ -1,15 +1,7 @@
-FROM python:3.7
+FROM base_requirement
 
-COPY requirements.txt requirements.txt
+COPY entry.sh /foo/app/entry.sh
 
-RUN apt-get update -y && \
-	apt-get install -y python3 python3-pip libgl1-mesa-glx
+WORKDIR /app/
 
-RUN pip3 install -r requirements.txt
-
-
-COPY . /app
-
-WORKDIR /app/server
-
-ENTRYPOINT /app/entry.sh
+ENTRYPOINT /foo/app/entry.sh

@@ -36,7 +36,6 @@
           </li>
           <li class="nav-item">
             <span id="times" class="nav-link"></span>
-            <span id="env" class="nav-link"></span>
           </li>
         </ul>
       </div>
@@ -76,7 +75,7 @@
       <hr class="divider" />
 
       <div class="row gx-4 gx-lg-5">
-        <div class="col-lg-4 col-md-6 text-center">
+        <div class="col-lg-3 col-md-6 text-center">
           <div class="mt-5">
             <div class="mb-2"><i class="bi-server fs-1 text-primary"></i></div>
             <label>
@@ -89,26 +88,38 @@
             </p-->
           </div>
         </div>
-        <div class="col-lg-4 col-md-6 text-center">
+        <div class="col-lg-3 col-md-6 text-center">
           <div class="mt-5">
             <div class="mb-2">
               <i class="bi-laptop fs-1 text-primary"></i>
             </div>
             <label>
               <h3 class="h4 rounded-pill border border-5 px-2 py-2">Initialize</h3>
-              <input type="button" value="Init" onclick="location.href='/init/lamb/guess/31'" style="display:none">
+              <input type="button" value="Init" style="display:none">
             </label>
             <!--p class="text-muted mb-0">
               All dependencies are kept current to keep things fresh.
             </p-->
           </div>
         </div>
-        <div class="col-lg-4 col-md-6 text-center">
+        <div class="col-lg-3 col-md-6 text-center">
           <div class="mt-5">
             <div class="mb-2"><i class="bi-tools fs-1 text-primary"></i></div>
             <label>
               <h3 class="h4 rounded-pill border border-5 px-2 py-2">Train Model</h3>
-              <input type="button" value="Train" onclick="location.href='/train'" style="display:none">
+              <input type="button" value="Train" style="display:none">
+            </label>
+            <!--p class="text-muted mb-0">
+              You can use this design as is, or you can make changes!
+            </p-->
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 text-center">
+          <div class="mt-5">
+            <div class="mb-2"><i class="bi-eye-fill fs-1 text-primary"></i></div>
+            <label>
+              <h3 class="h4 rounded-pill border border-5 px-2 py-2">Environment</h3>
+              <input type="button" value="Environment" style="display:none">
             </label>
             <!--p class="text-muted mb-0">
               You can use this design as is, or you can make changes!
@@ -138,9 +149,39 @@
             </tbody>
           </table>
         </div>
+        <div class="dcol-lg-4 col-md-6 text-center">
+          <table class="table d-none" name="env">
+            <thead>
+              <tr>
+                <th scope="col">Type</th>
+                <th scope="col">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Temperature</td>
+                <td id="temp">???</td>
+              </tr>
+              <tr>
+                <td>Humidity</td>
+                <td id="humi">???</td>
+              </tr>
+              <tr>
+                <td>A</td>
+                <td id="envA">???</td>
+              </tr>
+              <tr>
+                <td>B</td>
+                <td id="envBy">???</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </section>
+
+
 
   <!-- Footer-->
   <footer class="bg-light py-5">
@@ -150,6 +191,25 @@
       </div>
     </div>
   </footer>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">System Info</h5>
+        </div>
+        <div class="modal-body">
+          Process Complete.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="modal_close">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mymodal"></div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.js"
   integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="

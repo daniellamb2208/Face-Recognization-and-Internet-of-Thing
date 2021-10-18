@@ -81,7 +81,7 @@ void handle_OnConnect(){
   Temperature = dht.readTemperature();
   Humidity = dht.readHumidity();
 
-  server.send(200, "text/plain", String(Temperature)+" *C\n"+String(Humidity)+"%");
+  server.send(200, "text/plain", String(Temperature)+" °C\n"+String(Humidity)+"%");
 }
 
 
