@@ -1,0 +1,10 @@
+*jpg
+*.jpeg
+*.png
+.env
+test/*
+seperate/*
+*.pyc
+scc-container/back-end/sever/archive/*
+
+scc-container/mongo/*
